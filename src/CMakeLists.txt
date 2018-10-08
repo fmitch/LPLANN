@@ -1,0 +1,6 @@
+include_directories(${CMAKE_SOURCE_DIR})
+add_subdirectory(ops)
+add_subdirectory(types)
+add_subdirectory(linalg)
+add_subdirectory(construction)
+add_subdirectory(open_source)
