@@ -1,7 +1,7 @@
 add_library(linalg STATIC
     error.cpp
     error.hpp
-    matop.cpp
+#    matop.cpp
     matop.hpp
     norms.cpp
     norms.hpp

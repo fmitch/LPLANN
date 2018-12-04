@@ -1,5 +1,4 @@
 #include "src/linalg/parmatop.hpp"
-#include <stdio.h>
 #include <omp.h>
 
 double* parMatMul(double* A, double* B, int M, int N, int P){

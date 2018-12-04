@@ -2,140 +2,163 @@
 #include <map>
 #include <stdexcept>
 #include "src/types/types.hpp"
-#include "src/ops/conv.hpp"
+#include "src/types/binary.hpp"
+#include "src/types/fixed.hpp"
+#include "src/types/matrix.hpp"
+#include "src/binary/layer.hpp"
 #include "src/ops/print.hpp"
+#include "src/binary/bin_wrappers.hpp"
+#include "src/ops/op_wrappers.hpp"
 #include "src/open_source/cnpy/cnpy.hpp"
 #include "src/construction/network.hpp"
-#include "src/ops/print.hpp"
-//#include "src/ops/test.hpp"
 #include <vector>
 #include <string>
 
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/imgcodecs.hpp>
+
+
+#include <chrono>
+
 int main(){
-
-    Network net("example.json");
-    Input<float> input("train_images.npy");
-    std::cout << input.data->dims[0] << "  ";
-    std::cout << input.data->dims[1] << "  ";
-    std::cout << input.data->dims[2] << "  ";
-    std::cout << input.data->dims[3] << "  ";
-    std::vector<int> conv1_dims = { input.data->dims[0], input.data->dims[1], 
-                net.Layers[0].weights->dims[3]};
-    Matrix<float> conv1(conv1_dims);
-    for (int out=0; out<1; out++){//net.Layers[0].weights->dims[3]; i++){
-        for (int in=0; in<1; in++){//net.Layers[0].weights->dims[3]; i++){
-            conv2d(input.slice(in), input.data->dims[0], input.data->dims[1], conv1.slice(out), 
-                    net.Layers[0].weights->slice(out), net.Layers[0].weights->dims[0], "zero");
-        }
-    }
-
-    return 0;
-
-
-    //Load images into img1 and img2. 
-    /*
-    cnpy::NpyArray img_npy = cnpy::npy_load("train_images.npy");
-    for (int i = 0; i < img_npy.shape.size(); i++) {
-        std::cout << img_npy.shape[i] << std::endl;
-    }
-    auto point = reinterpret_cast<std::vector<double>*>(&( img_npy.data_holder.get() )[0]);
-    std::vector<double> images = *point;
-
-    std::vector<std::vector<float>> img1(28);
-    std::vector<std::vector<float>> img2(28);
-    for (int i=0; i<28; i++) {
-        img1[i].resize(28);
-        img2[i].resize(28);
-        for (int j=0; j<28; j++) {
-            img1[i][j] = images[i*28 + j];
-            std::cout << img1[i][j] << " " ;
-            img2[i][j] = images[784 + i*28 + j];
-        }
-    }
-
-    // Load filters into filter object.
-    cnpy::npz_t filters_npy = cnpy::npz_load("full.npz");
-
-    auto point1 = reinterpret_cast<std::vector<float>*>(&( filters_npy["arr_0"].data_holder.get() )[0]);
-    std::vector<float> output = *point1;
-    for (int i=0; i < output.size(); i++)
-        std::cout << output[i] << "  ";
-
-    std::map<int, std::vector<std::vector<std::vector<std::vector<float>>>>> conv_filters;
-    std::map<int, std::vector<std::vector<float>>> fc_layers;
-    std::map<int, std::vector<float>> biases;
-    for (auto it = filters_npy.begin(); it!=filters_npy.end(); it++){
-        if (it->second.word_size == 4){
-            auto filter_pointer = reinterpret_cast<std::vector<float>*>(&( img_npy.data_holder.get() )[0]);
-            std::vector<float> filter = *filter_pointer;
-        } else {
-            throw std::exception();
-        }
-        if (it->second.shape.size() == 4){
-            std::vector<std::vector<std::vector<std::vector<float>>>> conv_filter(it->second.shape[0]);
-            for (int i=0; i<it->second.shape[0]; i++) {
-                conv_filter[i].resize(it->second.shape[1]);
-                for (int j=0; j<it->second.shape[1]; j++) {
-                    conv_filter[i][j].resize(it->second.shape[2]);
-                    for (int k=0; k<it->second.shape[2]; k++) {
-                        conv_filter[i][j][k].resize(it->second.shape[3]);
-                    }
-                }
-            }
-            //conv_filters[0] = 
-        }
-
-
+    //cv::VideoCapture vCap(0);
     
+    cv::Mat frame(416, 416, CV_8UC3);
+    while(1){
+		auto start = std::chrono::high_resolution_clock::now();
+/*
+        vCap >> frame; // get a new frame from camera
+        cv::imshow( "Frame", frame );
+         
+        // Press  ESC on keyboard to exit
+        //char c = (char)cv::waitKey(25);
+        //if(c==27)
+        //    break;
+*/
+		cv::Mat inFrame = cv::imread("dog.jpg", cv::IMREAD_COLOR);
+        cv::resize(inFrame, frame, frame.size());
 
+		std::shared_ptr<Matrix<float>> input_img;
+		int channels = frame.channels();
 
-    std::vector<std::vector<int> > img(6);
-    for(int i=0; i<6; i++)
-    {
-        img[i].resize(6);
-        for(int j=0; j<6; j++)
-            img[i][j] = 1;
-    }
-    img[3][3] = 4;
-    img[4][4] = 4;
-    img[0][2] = 0;
-    std::cout << "The image \n";
-    print_2_dim_vec(img);
-    std::vector<std::vector<int> > filter(3);
-    for(int i=0; i<3; i++)
-    {
-        filter[i].resize(3);
-        for(int j=0; j<3; j++)
-            filter[i][j] = 0;
-    }
-    filter[2][2] = 1;
-    filter[2][1] = 1;
-    filter[0][1] = 2;
-    std::cout << "Filter \n";
-    print_2_dim_vec(filter);
-    std::vector<std::vector<int> > out1 = conv2d(img,filter,"zero");
-    std::cout << "Zero padding \n";
-    print_2_dim_vec(out1);
-    std::vector<std::vector<int> > out2 = conv2d(img,filter,"none");
-    std::cout << "No padding \n";
-    print_2_dim_vec(out2);
-    std::vector<std::vector<int> > out3 = conv2d(img,filter,"repeat");
-    std::cout << "Repeat padding \n";
-    print_2_dim_vec(out3);
+		int nRows = frame.rows;
+		int nCols = frame.cols;
+		input_img.reset(new Matrix<float>(std::vector<int>{nRows, nCols, channels}));
+
+		uchar* p = frame.data;
+		int count = 0;
+        for (int j = 0; j < nRows; ++j){
+            for(int i = 0; i < nCols; ++i){
+                for (int k = 0; k < channels; ++k){
+					input_img->arr[i+j*nCols+k*nRows*nCols] = p[count]/255.0;
+					count++;
+				}
+			}
+		}
+        float * inp = input_img->arr;
+
+		//Initialize network
+		cnpy::NpyArray labels_npy = cnpy::npy_load("train_labels.npy");
+		auto label_pointer = reinterpret_cast<std::vector<int>*>(&(labels_npy.data_holder.get())[0]);
+		std::vector<int> labels = *label_pointer;
+
+		std::vector<int> input_dimensions = {416,416,3};
+		Input<float> input(input_dimensions, 1);
+		//input.load_data("train_images.npy", true);
+		input.output = input_img;
+		float * in = input.output->arr;
+		std::vector<int> dims = input.output->dims;
+
+		// Initialize float network
+		Layer<float> conv1(input_dimensions, CONV2D, std::vector<int>{3,3,3,16}, true);
+		Layer<float> pool1(input_dimensions, POOL, std::vector<int>{2,2}, false);
+		Layer<float> conv2(input_dimensions, CONV2D, std::vector<int>{3,3,16,32}, true);
+		Layer<float> pool2(input_dimensions, POOL, std::vector<int>{2,2}, false);
+		Layer<float> conv3(input_dimensions, CONV2D, std::vector<int>{3,3,32,64}, true);
+		Layer<float> pool3(input_dimensions, POOL, std::vector<int>{2,2}, false);
+		Layer<float> conv4(input_dimensions, CONV2D, std::vector<int>{3,3,64,128}, true);
+		Layer<float> pool4(input_dimensions, POOL, std::vector<int>{2,2}, false);
+		Layer<float> conv5(input_dimensions, CONV2D, std::vector<int>{3,3,128,256}, true);
+		Layer<float> pool5(input_dimensions, POOL, std::vector<int>{2,2}, false);
+		Layer<float> conv6(input_dimensions, CONV2D, std::vector<int>{3,3,256,512}, true);
+		Layer<float> pool6(input_dimensions, POOL, std::vector<int>{1,1}, false);
+		Layer<float> conv7(input_dimensions, CONV2D, std::vector<int>{3,3,512,1024}, true);
+		Layer<float> conv8(input_dimensions, CONV2D, std::vector<int>{3,3,1024,1024}, true);
+		Layer<float> conv9(input_dimensions, CONV2D, std::vector<int>{1,1,1024,125}, true);
+
+		// Load float weights
+		conv1.load_weights("yolov2_flipped.npz", "arr_0");
+		conv1.load_bias("yolov2_flipped.npz", "arr_1");
+		float * w1 = conv1.weights->arr;
+		float * b1 = conv1.bias->arr;
+		conv2.load_weights("yolov2_flipped.npz", "arr_2");
+		conv2.load_bias("yolov2_flipped.npz", "arr_3");
+		conv3.load_weights("yolov2_flipped.npz", "arr_4");
+		conv3.load_bias("yolov2_flipped.npz", "arr_5");
+		conv4.load_weights("yolov2_flipped.npz", "arr_6");
+		conv4.load_bias("yolov2_flipped.npz", "arr_7");
+		conv5.load_weights("yolov2_flipped.npz", "arr_8");
+		conv5.load_bias("yolov2_flipped.npz", "arr_9");
+		conv6.load_weights("yolov2_flipped.npz", "arr_10");
+		conv6.load_bias("yolov2_flipped.npz", "arr_11");
+		conv7.load_weights("yolov2_flipped.npz", "arr_12");
+		conv7.load_bias("yolov2_flipped.npz", "arr_13");
+		conv8.load_weights("yolov2_flipped.npz", "arr_14");
+		conv8.load_bias("yolov2_flipped.npz", "arr_15");
+		conv9.load_weights("yolov2_flipped.npz", "arr_16");
+		conv9.load_bias("yolov2_flipped.npz", "arr_17");
+
+        float leaky_param = 10.0;
+        conv2d_wrapper(input, conv1);
+		float * out = conv1.output->arr;
+        pool_wrapper(conv1, pool1, MAX);
+		out = pool1.output->arr;
+        leaky_wrapper(pool1, pool1, leaky_param);
+
+        conv2d_wrapper(pool1, conv2);
+		out = conv2.output->arr;
+        pool_wrapper(conv2, pool2, MAX);
+		out = pool2.output->arr;
+        leaky_wrapper(pool2, pool2, leaky_param);
+
+        conv2d_wrapper(pool2, conv3);
+		out = conv3.output->arr;
+        pool_wrapper(conv3, pool3, MAX);
+        leaky_wrapper(pool3, pool3, leaky_param);
+
+        conv2d_wrapper(pool3, conv4);
+		out = conv4.output->arr;
+        pool_wrapper(conv4, pool4, MAX);
+        leaky_wrapper(pool4, pool4, leaky_param);
+
+        conv2d_wrapper(pool4, conv5);
+		out = conv5.output->arr;
+        pool_wrapper(conv5, pool5, MAX);
+        leaky_wrapper(pool5, pool5, leaky_param);
+
+        conv2d_wrapper(pool5, conv6);
+		out = conv6.output->arr;
+        pool_wrapper(conv6, pool6, MAX);
+        leaky_wrapper(pool6, pool6, leaky_param);
+
+        conv2d_wrapper(pool6, conv7);
+		out = conv7.output->arr;
+        leaky_wrapper(conv7, conv7, leaky_param);
+        
+        conv2d_wrapper(conv7, conv8);
+		out = conv8.output->arr;
+        leaky_wrapper(conv8, conv8, leaky_param);
+
+        conv2d_wrapper(conv8, conv9);
+		out = conv9.output->arr;
+
+		auto stop = std::chrono::high_resolution_clock::now(); 
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start); 
+		std::cout << duration.count() << std::endl; 
+	}
 
     return 0;
-}
-
-28, 28
-conv2d 64, 8X8 2 stride, SAME padding
-Relu
-Conv2d 128, 6X6, 2 stride VALID padding
-Relu
-Conv2d 128, 5x5, 1 stride, valid padding
-Relu
-Flatten
-Linear
-Softmax
-*/
-
 }

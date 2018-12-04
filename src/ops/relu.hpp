@@ -3,37 +3,42 @@
 
 #include <vector>
 #include <algorithm>
+#include <memory>
 
 template <typename T>
-std::vector<std::vector<T> > relu(std::vector<std::vector<T> > input){
-    std::vector<std::vector<T> > output;
-    output.resize(input.size());
-
-    for( int i = 0; i < output.size(); i++)
-        output[i].resize(input[0].size());
-
-    for( int i = 0; i < input.size(); i++){
-        for(int j = 0; j < input[0].size(); j++){
-            output[i][j] = std::max(input[i][j], 0);
-        }
+void relu(std::shared_ptr<Matrix<T>> input, std::shared_ptr<Matrix<T>> output){
+    int size = 1;
+    for( int i = 0; i < input->dims.size(); i++){
+        size *= input->dims[i];
     }
-    return output;
+    for(int i = 0; i < size; i++){
+        output->arr[i] = std::max<T>(input->arr[i], 0);
+    }
 }
 
 template <typename T>
-std::vector<std::vector<T> > leaky_relu(std::vector<std::vector<T> > input, int a=100){
-    std::vector<std::vector<T> > output;
-    output.resize(input.size());
-
-    for( int i = 0; i < output.size(); i++)
-        output[i].resize(input[0].size());
-
-    for( int i = 0; i < input.size(); i++){
-        for(int j = 0; j < input[0].size(); j++){
-            output[i][j] = std::max(input[i][j]/a, input[i][j]);
-        }
+void leaky_relu(std::shared_ptr<Matrix<T>> input, std::shared_ptr<Matrix<T>> output, T a){
+    int size = 1;
+    for( int i = 0; i < input->dims.size(); i++){
+        size *= input->dims[i];
     }
-    return output;
+    for(int i = 0; i < size; i++){
+        output->arr[i] = std::max(input->arr[i]/a, input->arr[i]);
+    }
+}
+
+template <typename T>
+void relu(T* input, T* output, int size){
+    for(int i = 0; i < size; i++){
+        output[i] = std::max<T>(output[i], 0);
+    }
+}
+
+template <typename T>
+void relu(T* input, T* output, int size, T a){
+    for(int i = 0; i < size; i++){
+        output->arr[i] = std::max(input->arr[i]/a, input->arr[i]);
+    }
 }
 
 #endif

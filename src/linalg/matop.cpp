@@ -1,33 +1,32 @@
 #include "src/linalg/matop.hpp"
 #include <stdio.h>
 
-float* matAdd(float* A, float* B, int M, int N){
-    float* C = new float[M*N];
+void matAdd(T* A, T* B, int M, int N, T* output){
     for (int i=0; i< M; i++)
         for (int j = 0; j < N; j++)
-            *((C+i*N) + j) = *((A+i*N) + j) + *((B+i*N) + j);
-    return C;
+            *((output+i*N) + j) = *((A+i*N) + j) + *((B+i*N) + j);
 }
 
-float* matSub(float* A, float* B, int M, int N){
-    float* C = new float[M*N];
+void matAddScalarInPlace(T* A, int M, int N, T scalar){
     for (int i=0; i< M; i++)
         for (int j = 0; j < N; j++)
-            *((C+i*N) + j) = *((A+i*N) + j) - *((B+i*N) + j);
-    return C;
+            *((A+i*N) + j) += scalar;
 }
 
-float* scaleMat(float* A, int M, int N, float scalar){
-    float* C = new float[M*N];
+void matSub(T* A, T* B, int M, int N, T* output){
+    for (int i=0; i< M; i++)
+        for (int j = 0; j < N; j++)
+            *((output+i*N) + j) = *((A+i*N) + j) - *((B+i*N) + j);
+}
+
+void scaleMat(T* A, int M, int N, T scalar, T* output){
     for (int i=0; i<M ; i++)
         for (int j = 0; j < N; j++)
-            *((C+i*N) + j) = *((A+i*N) + j) * scalar;
-    return C;
+            *((output+i*N) + j) = *((A+i*N) + j) * scalar;
 }
 
-float* matMul(float* A, float* B, int M, int N, int P){
-    float* C = new float[M*N];
-    float dot;
+void matMul(T* A, T* B, int M, int N, int P, T* output){
+    T dot;
     for (int i = 0; i<M; i++)
         for ( int k=0; k<P; k++)
         {
@@ -36,26 +35,23 @@ float* matMul(float* A, float* B, int M, int N, int P){
             {
                 dot += (*((A+i*N) + j)) * (*((B+j*P) + k));
             }
-            *((C+i*P) + k)  = dot;
+            *((output+i*P) + k)  = dot;
         }
-    return C;
 }
 
-float* matVecMul(float* A, float* v, int M, int N){
-    float* C = new float[M];
-    float dot;
+void matVecMul(T* A, T* v, int M, int N, T* output){
+    T dot;
     for (int i = 0; i<M; i++)
     {
         dot = 0;
         for (int j=0; j<N; j++)
             dot += *((A+i*N) + j) * v[j];
-        C[i] = dot;
+        output[i] = dot;
     }
-    return C;
 }
 
-float dotProduct(float* v1, float* v2, int size){
-    float out = 0;
+T dotProduct(T* v1, T* v2, int size){
+    T out = 0;
     for (int i = 0; i < size; i++)
         out += v1[i] * v2[i];
     return out;
