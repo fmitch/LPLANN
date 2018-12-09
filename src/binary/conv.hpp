@@ -8,7 +8,7 @@
 #include <math.h>
 #include <omp.h>
 
-void reg2bin_conv(Layer<binary16> & in_layer, Layer<binary16> & out_layer, bool bias){
+void reg2bin_conv(Layer<binary16> & in_layer, Layer<binary16> & out_layer){
     int M = out_layer.output->dims[0];
     int N = out_layer.output->dims[1];
     int O = out_layer.output->dims[2];
@@ -80,7 +80,7 @@ void reg2bin_conv(Layer<binary16> & in_layer, Layer<binary16> & out_layer, bool 
     }
 }
 
-void float2bin_conv(Layer<float> & in_layer, Layer<binary16> & out_layer, int slice, bool bias){
+void float2bin_conv(Layer<float> & in_layer, Layer<binary16> & out_layer, int slice){
     int M = in_layer.output->dims[0];
     int N = in_layer.output->dims[1];
     int K = out_layer.weights->dims[0];
@@ -125,7 +125,7 @@ void float2bin_conv(Layer<float> & in_layer, Layer<binary16> & out_layer, int sl
 }
 
 
-void float2bin_conv(Layer<float> & in_layer, Layer<binary16> & out_layer, bool bias){
+void float2bin_conv(Layer<float> & in_layer, Layer<binary16> & out_layer){
     int M = in_layer.output->dims[0];
     int N = in_layer.output->dims[1];
     int K = out_layer.weights->dims[0];

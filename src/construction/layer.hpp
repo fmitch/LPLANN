@@ -1,5 +1,5 @@
-#ifndef NETWORK_HPP
-#define NETWORK_HPP
+#ifndef LAYER_HPP
+#define LAYER_HPP
 
 #include <vector>
 #include "src/types/types.hpp"
@@ -15,18 +15,18 @@ class Layer {
     bool has_bias;
     int remainder;
     //void (*operation)(Layer<inT, inT>&, Layer<T, T>&, bool);
-    std::shared_ptr<Matrix<T>> output;
-    std::shared_ptr<Matrix<T>> weights;
-    std::shared_ptr<Matrix<T>> bias;
+    Matrix<T>* output;
+    Matrix<T>* weights;
+    Matrix<T>* bias;
     void internal_load_weights(std::vector<float>* weight_pointer, std::vector<size_t> dims);
     void load_weights(std::string filename);
     void load_weights(std::string filename, std::string varname);
     void load_weights(std::map<std::string, cnpy::NpyArray>::iterator it);
-    void load_weights(std::shared_ptr<Matrix<T>> mat);
+    void load_weights(Matrix<T>* mat);
     void load_bias(std::string filename);
     void load_bias(std::string filename, std::string varname);
     void load_bias(std::map<std::string, cnpy::NpyArray>::iterator it);
-    void load_bias(std::shared_ptr<Matrix<T>> mat);
+    void load_bias(Matrix<T>* mat);
     Layer(std::vector<int> &prev_dimensions, int op, std::vector<int> op_dimensions, bool is_bias=true);
     Layer(){}
 };
@@ -76,7 +76,7 @@ void Layer<T>::load_weights(std::map<std::string, cnpy::NpyArray>::iterator it){
 }
 
 template <typename T>
-void Layer<T>::load_weights(std::shared_ptr<Matrix<T>> mat){
+void Layer<T>::load_weights(Matrix<T>* mat){
     weights  = mat;
 }
 
@@ -109,8 +109,8 @@ void Layer<T>::load_bias(std::map<std::string, cnpy::NpyArray>::iterator it){
 }
 
 template <typename T>
-void Layer<T>::load_bias(std::shared_ptr<Matrix<T>> mat){
-    bias.reset(mat);
+void Layer<T>::load_bias(Matrix<T>* mat){
+    bias = mat;
 }
 
 template <typename T>
@@ -130,9 +130,9 @@ Layer<T>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<int> op_
             weight_dims.push_back(op_dimensions[1]);
             weight_dims.push_back(prev_dimensions[2]);
             weight_dims.push_back(op_dimensions.back());
-            weights.reset(new Matrix<T>(weight_dims));
+            weights = new Matrix<T>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<T>(output_dims.back()));
+                bias = new Matrix<T>(output_dims.back());
             }
             break;
         case POOL:
@@ -153,9 +153,9 @@ Layer<T>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<int> op_
             //operation = fc_wrapper; //WRAPPER
             weight_dims.push_back(flat_size);
             weight_dims.push_back(op_dimensions[0]);
-            weights.reset(new Matrix<T>(weight_dims));
+            weights = new Matrix<T>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<T>(output_dims.back()));
+                bias = new Matrix<T>(output_dims.back());
             }
             break;
         }
@@ -177,7 +177,7 @@ Layer<T>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<int> op_
             //operation = relu_wrapper; //WRAPPER
             break;
     }
-    output.reset(new Matrix<T>(output_dims));
+    output = new Matrix<T>(output_dims);
     prev_dimensions = output_dims;
     return;
 }
@@ -206,7 +206,7 @@ class Input: public Layer<T> {
 
     Input(std::vector<int> dims, int num_images):Layer<T>(){
         std::vector<int> dis = {dims[0],dims[1],dims[2], num_images};
-        this->output.reset(new Matrix<T>(dis));
+        this->output = new Matrix<T>(dis);
     }
 
     void load_data(std::string filename, bool is_bias){
@@ -215,7 +215,7 @@ class Input: public Layer<T> {
         std::vector<float> img_vec = *img_pointer;
         std::vector<int> d = this->output->dims;
         if (is_bias){
-            this->bias.reset(new Matrix<T>(this->output->dims.back()));
+            this->bias = new Matrix<T>(this->output->dims.back());
         }
         for (int j=0; j<d[0]; j++){ //Num of images
             for (int k=0; k<d[1]; k++){ //X

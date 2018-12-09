@@ -7,7 +7,8 @@ template <typename T>
 struct Matrix 
 {
     T* arr;
-    
+    int size;
+
     std::vector<int> dims;
     T* slice(int ind){
         return arr+ ind*dims[0]*dims[1];
@@ -16,15 +17,17 @@ struct Matrix
         return arr + ind*dims[0]*dims[1] + output*dims[0]*dims[1]*dims[2];
     }
     Matrix(std::vector<int> d){ 
-        int size = 1;
+        int s = 1;
         for (int i =0; i < d.size(); i++){ 
-            size *= d[i]; }
+            s *= d[i]; }
+        size = s;
         dims = d;
         arr = new T[size];
         for (int i = 0; i < size; i++){ 
             arr[i] = 0; }
     }
     Matrix(int d){ 
+        size = d;
         dims.push_back(d);
         arr = new T[d];
         for (int i = 0; i < d; i++){

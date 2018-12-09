@@ -3,11 +3,10 @@
 
 #include <algorithm>
 #include <limits>
-#include <memory>
 #include <string>
 
 template <typename T>
-void pool(std::shared_ptr<Matrix<T>> input,  int pool_size, int stride, std::shared_ptr<Matrix<T>> output, int pool_type){
+void pool(Matrix<T>* input,  int pool_size, int stride, Matrix<T>* output, int pool_type){
     switch (pool_type){
         case MAX:
             max_pooling(input, pool_size, stride, output);
@@ -22,7 +21,7 @@ void pool(std::shared_ptr<Matrix<T>> input,  int pool_size, int stride, std::sha
 }
 
 template <typename T>
-void max_pooling(std::shared_ptr<Matrix<T>> input, int pool_size, int stride, std::shared_ptr<Matrix<T>> output){
+void max_pooling(Matrix<T>* input, int pool_size, int stride, Matrix<T>* output){
     for( int h = 0; h < input->dims[2]; h++){
         for( int i = 0; i < input->dims[0]; i= i + stride){
             for(int j = 0; j < input->dims[1]; j = j + stride){
@@ -39,7 +38,7 @@ void max_pooling(std::shared_ptr<Matrix<T>> input, int pool_size, int stride, st
 }
 
 template <typename T>
-void zero_pooling(std::shared_ptr<Matrix<T>> input, int pool_size, int stride, std::shared_ptr<Matrix<T>> output){
+void zero_pooling(Matrix<T>* input, int pool_size, int stride, Matrix<T>* output){
     for( int h = 0; h < input->dims[2]; h++){
         for( int i = 0; i < input->dims[0]; i= i + stride){
             for(int j = 0; j < input->dims[1]; j = j + stride){
@@ -56,7 +55,7 @@ void zero_pooling(std::shared_ptr<Matrix<T>> input, int pool_size, int stride, s
 }
 
 template <typename T>
-void average_pooling(std::shared_ptr<Matrix<T>> input,  int pool_size, int stride, std::shared_ptr<Matrix<T>> output){
+void average_pooling(Matrix<T>* input,  int pool_size, int stride, Matrix<T>* output){
     for( int h = 0; h < input->dims[2]; h++){
         for( int i = 0; i< input->dims[0]; i= i + stride){
             for(int j = 0; j < input->dims[1]; j = j + stride){

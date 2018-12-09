@@ -1,7 +1,7 @@
 #ifndef FC_HPP
 #define FC_HPP
 
-#include "src/construction/network.hpp"
+#include "src/construction/layer.hpp"
 
 template <typename T1>
 void flatten_3d(Layer <T1> & in_layer, Layer <T1> & out_layer){

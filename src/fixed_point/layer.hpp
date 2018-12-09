@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "src/types/types.hpp"
-#include "src/construction/network.hpp"
+#include "src/construction/layer.hpp"
 #include "src/open_source/cnpy/cnpy.hpp"
 #include <string>
 #include <map>
@@ -59,7 +59,7 @@ void Layer<fixed>::load_weights(std::map<std::string, cnpy::NpyArray>::iterator 
 }
 
 template <>
-void Layer<fixed>::load_weights(std::shared_ptr<Matrix<fixed>> mat){
+void Layer<fixed>::load_weights(Matrix<fixed>* mat){
     weights = mat;
 }
 

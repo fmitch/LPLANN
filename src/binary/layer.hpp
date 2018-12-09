@@ -1,9 +1,9 @@
-#ifndef BINARY_HPP
-#define BINARY_HPP
+#ifndef BINARY_LAYER_HPP
+#define BINARY_LAYER_HPP
 
 #include <vector>
 #include "src/types/types.hpp"
-#include "src/construction/network.hpp"
+#include "src/construction/layer.hpp"
 #include "src/open_source/cnpy/cnpy.hpp"
 #include <string>
 #include <map>
@@ -77,7 +77,7 @@ void Layer<binary16>::load_weights(std::map<std::string, cnpy::NpyArray>::iterat
 }
 
 template <>
-void Layer<binary16>::load_weights(std::shared_ptr<Matrix<binary16>> mat){
+void Layer<binary16>::load_weights(Matrix<binary16>* mat){
     weights = mat;
 }
 
@@ -126,9 +126,9 @@ Layer<binary16>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
 
             weight_dims.push_back(prev_dimensions[2]);
             weight_dims.push_back(op_dimensions.back());
-            weights.reset(new Matrix<binary16>(weight_dims));
+            weights = new Matrix<binary16>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<binary16>(output_dims.back()));
+                bias = new Matrix<binary16>(output_dims.back());
             }
             break;
         case CONV2D_BIN_FIRST:
@@ -141,9 +141,9 @@ Layer<binary16>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
             weight_dims.push_back(op_dimensions[1]);
             weight_dims.push_back(op_dimensions[2]);
             weight_dims.push_back(op_dimensions.back());
-            weights.reset(new Matrix<binary16>(weight_dims));
+            weights = new Matrix<binary16>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<binary16>(output_dims.back()));
+                bias = new Matrix<binary16>(output_dims.back());
             }
             break;
         case POOL:
@@ -164,9 +164,9 @@ Layer<binary16>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
             output_dims.push_back(op_dimensions[0]);
             weight_dims.push_back(shorts_per_column);
             weight_dims.push_back(op_dimensions[0]);
-            weights.reset(new Matrix<binary16>(weight_dims));
+            weights = new Matrix<binary16>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<binary16>(output_dims.back()));
+                bias = new Matrix<binary16>(output_dims.back());
             }
             break;
         }
@@ -189,7 +189,7 @@ Layer<binary16>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
             }
             break;
     }
-    output.reset(new Matrix<binary16>(output_dims));
+    output = new Matrix<binary16>(output_dims);
     prev_dimensions = output_dims;
     return;
 }
@@ -268,7 +268,7 @@ void Layer<binary64>::load_weights(std::map<std::string, cnpy::NpyArray>::iterat
 }
 
 template <>
-void Layer<binary64>::load_weights(std::shared_ptr<Matrix<binary64>> mat){
+void Layer<binary64>::load_weights(Matrix<binary64>* mat){
     weights = mat;
 }
 
@@ -317,9 +317,9 @@ Layer<binary64>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
 
             weight_dims.push_back(prev_dimensions[2]);
             weight_dims.push_back(op_dimensions.back());
-            weights.reset(new Matrix<binary64>(weight_dims));
+            weights = new Matrix<binary64>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<binary64>(output_dims.back()));
+                bias = new Matrix<binary64>(output_dims.back());
             }
             break;
         case CONV2D_BIN_FIRST:
@@ -332,9 +332,9 @@ Layer<binary64>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
             weight_dims.push_back(op_dimensions[1]);
             weight_dims.push_back(op_dimensions[2]);
             weight_dims.push_back(op_dimensions.back());
-            weights.reset(new Matrix<binary64>(weight_dims));
+            weights = new Matrix<binary64>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<binary64>(output_dims.back()));
+                bias = new Matrix<binary64>(output_dims.back());
             }
             break;
         case POOL:
@@ -355,9 +355,9 @@ Layer<binary64>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
             output_dims.push_back(op_dimensions[0]);
             weight_dims.push_back(shorts_per_column);
             weight_dims.push_back(op_dimensions[0]);
-            weights.reset(new Matrix<binary64>(weight_dims));
+            weights = new Matrix<binary64>(weight_dims);
             if (is_bias){
-                bias.reset(new Matrix<binary64>(output_dims.back()));
+                bias = new Matrix<binary64>(output_dims.back());
             }
             break;
         }
@@ -379,7 +379,7 @@ Layer<binary64>::Layer(std::vector<int> & prev_dimensions, int op, std::vector<i
             }
             break;
     }
-    output.reset(new Matrix<binary64>(output_dims));
+    output = new Matrix<binary64>(output_dims);
     prev_dimensions = output_dims;
     return;
 }

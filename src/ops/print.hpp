@@ -4,10 +4,9 @@
 #include <iostream>
 #include "src/types/types.hpp"
 #include <vector>
-#include <memory>
 
 template <typename T>
-void print_2d_slice(std::shared_ptr<Matrix<T>> mat, int slice){
+void print_2d_slice(Matrix<T>* mat, int slice){
     int M = mat->dims[0];
     int N = mat->dims[1];
     T* arr = mat->slice(slice);
@@ -21,7 +20,16 @@ void print_2d_slice(std::shared_ptr<Matrix<T>> mat, int slice){
 }
 
 template <typename T>
-void print_2d_slice(std::shared_ptr<Matrix<T>> mat, int slice, int layer){
+void print_1d_vector(Matrix<T>* mat){
+    int M = mat->dims[0];
+    for(int x=0; x<M; x++){
+        std::cout << mat->arr[x] << "  ";
+    }
+    std::cout << std::endl;;
+}
+
+template <typename T>
+void print_2d_slice(Matrix<T>* mat, int slice, int layer){
     int M = mat->dims[0];
     int N = mat->dims[1];
     T* arr = mat->slice(slice, layer);

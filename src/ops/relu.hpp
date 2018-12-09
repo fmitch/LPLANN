@@ -3,10 +3,9 @@
 
 #include <vector>
 #include <algorithm>
-#include <memory>
 
 template <typename T>
-void relu(std::shared_ptr<Matrix<T>> input, std::shared_ptr<Matrix<T>> output){
+void relu(Matrix<T> * input, Matrix<T>* output){
     int size = 1;
     for( int i = 0; i < input->dims.size(); i++){
         size *= input->dims[i];
@@ -17,7 +16,7 @@ void relu(std::shared_ptr<Matrix<T>> input, std::shared_ptr<Matrix<T>> output){
 }
 
 template <typename T>
-void leaky_relu(std::shared_ptr<Matrix<T>> input, std::shared_ptr<Matrix<T>> output, T a){
+void leaky_relu(Matrix<T>* input, Matrix<T>* output, T a){
     int size = 1;
     for( int i = 0; i < input->dims.size(); i++){
         size *= input->dims[i];

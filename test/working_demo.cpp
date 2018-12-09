@@ -55,33 +55,40 @@ int main(){
 	int num_classes = 14;
 
     // Initialize float network
-    Layer<binary16> conv1(input_dimensions, CONV2D_BIN_FIRST, std::vector<int>{3,3,3,32}, false);
-    Layer<binary16> pool1(input_dimensions, POOL, std::vector<int>{2,2}, false);
-    Layer<binary16> conv2(input_dimensions, CONV2D, std::vector<int>{3,3,32,64}, false);
-    Layer<binary16> pool2(input_dimensions, POOL, std::vector<int>{2,2}, false);
-    Layer<binary16> conv3(input_dimensions, CONV2D, std::vector<int>{3,3,64,64}, false);
-    Layer<binary16> pool3(input_dimensions, POOL, std::vector<int>{2,2}, false);
-    Layer<binary16> conv4(input_dimensions, CONV2D, std::vector<int>{3,3,64,128}, false);
-    Layer<binary16> pool4(input_dimensions, POOL, std::vector<int>{2,2}, false);
-    Layer<binary16> conv5(input_dimensions, CONV2D, std::vector<int>{3,3,64,128}, false);
-    Layer<binary16> pool5(input_dimensions, POOL, std::vector<int>{2,2}, false);
-    Layer<binary16> conv6(input_dimensions, CONV2D, std::vector<int>{3,3,64,256}, false);
-    Layer<binary16> pool6(input_dimensions, POOL, std::vector<int>{2,2}, false);
-    Layer<binary16> flat(input_dimensions, FLATTEN, std::vector<int>{0}, false);
+    Layer<float> conv1(input_dimensions, CONV2D, std::vector<int>{3,3,3,32}, true);
+    Layer<float> pool1(input_dimensions, POOL, std::vector<int>{2,2}, false);
+    Layer<float> conv2(input_dimensions, CONV2D, std::vector<int>{3,3,32,64}, true);
+    Layer<float> pool2(input_dimensions, POOL, std::vector<int>{2,2}, false);
+    Layer<float> conv3(input_dimensions, CONV2D, std::vector<int>{3,3,64,64}, true);
+    Layer<float> pool3(input_dimensions, POOL, std::vector<int>{2,2}, false);
+    Layer<float> conv4(input_dimensions, CONV2D, std::vector<int>{3,3,64,64}, true);
+    Layer<float> pool4(input_dimensions, POOL, std::vector<int>{2,2}, false);
+    Layer<float> conv5(input_dimensions, CONV2D, std::vector<int>{3,3,64,64}, true);
+    Layer<float> pool5(input_dimensions, POOL, std::vector<int>{2,2}, false);
+    Layer<float> conv6(input_dimensions, CONV2D, std::vector<int>{3,3,64,64}, true);
+    Layer<float> pool6(input_dimensions, POOL, std::vector<int>{2,2}, false);
+    Layer<float> flat(input_dimensions, ACTIVATION, std::vector<int>{0}, false);
 
-    Layer<binary16> fc1(input_dimensions, MULTIPLY, std::vector<int>{1024}, false);
-    Layer<binary16> fc2(input_dimensions, MULTIPLY, std::vector<int>{num_classes}, false);
-    //Layer<float> out(input_dimensions, ACTIVATION, std::vector<int>{0}, false);
+    Layer<float> fc1(input_dimensions, MULTIPLY, std::vector<int>{1024}, true);
+    Layer<float> fc2(input_dimensions, MULTIPLY, std::vector<int>{num_classes}, true);
 
     // Load float weights
-    conv1.load_weights("bnn6_20.npz", "arr_0");
-    conv2.load_weights("bnn6_20.npz", "arr_1");
-    conv3.load_weights("bnn6_20.npz", "arr_2");
-    conv4.load_weights("bnn6_20.npz", "arr_3");
-    conv5.load_weights("bnn6_20.npz", "arr_4");
-    conv6.load_weights("bnn6_20.npz", "arr_5");
-    fc1.load_weights("bnn6_20.npz", "arr_6");
-    fc2.load_weights("bnn6_20.npz", "arr_7");
+    conv1.load_weights("layer6_32_small_47.npz", "arr_0");
+    conv1.load_bias("layer6_32_small_47.npz", "arr_1");
+    conv2.load_weights("layer6_32_small_47.npz", "arr_2");
+    conv2.load_bias("layer6_32_small_47.npz", "arr_3");
+    conv3.load_weights("layer6_32_small_47.npz", "arr_4");
+    conv3.load_bias("layer6_32_small_47.npz", "arr_5");
+    conv4.load_weights("layer6_32_small_47.npz", "arr_6");
+    conv4.load_bias("layer6_32_small_47.npz", "arr_7");
+    conv5.load_weights("layer6_32_small_47.npz", "arr_8");
+    conv5.load_bias("layer6_32_small_47.npz", "arr_9");
+    conv6.load_weights("layer6_32_small_47.npz", "arr_10");
+    conv6.load_bias("layer6_32_small_47.npz", "arr_11");
+    fc1.load_weights("layer6_32_small_47.npz", "arr_12");
+    fc1.load_bias("layer6_32_small_47.npz", "arr_13");
+    fc2.load_weights("layer6_32_small_47.npz", "arr_14");
+    fc2.load_bias("layer6_32_small_47.npz", "arr_15");
 
 
 
@@ -128,26 +135,41 @@ int main(){
 
 
         conv2d_wrapper(input, conv1);
-        pool_wrapper(conv1, pool1, ZERO);
+        float * c1 = conv1.output->arr;
+        pool_wrapper(conv1, pool1, MAX);
+        relu_wrapper(pool1, pool1);
 
         conv2d_wrapper(pool1, conv2);
-        pool_wrapper(conv2, pool2, ZERO);
+        float * c2 = conv2.output->arr;
+        pool_wrapper(conv2, pool2, MAX);
+        relu_wrapper(pool2, pool2);
 
         conv2d_wrapper(pool2, conv3);
-        pool_wrapper(conv3, pool3, ZERO);
+        float * c3 = conv3.output->arr;
+        pool_wrapper(conv3, pool3, MAX);
+        relu_wrapper(pool3, pool3);
 
         conv2d_wrapper(pool3, conv4);
-        pool_wrapper(conv4, pool4, ZERO);
+        float * c4 = conv4.output->arr;
+        pool_wrapper(conv4, pool4, MAX);
+        relu_wrapper(pool4, pool4);
 
         conv2d_wrapper(pool4, conv5);
-        pool_wrapper(conv5, pool5, ZERO);
+        float * c5 = conv5.output->arr;
+        pool_wrapper(conv5, pool5, MAX);
+        relu_wrapper(pool5, pool5);
 
         conv2d_wrapper(pool5, conv6);
-        pool_wrapper(conv6, pool6, ZERO);
+        float * c6 = conv6.output->arr;
+        pool_wrapper(conv6, pool6, MAX);
+        relu_wrapper(pool6, pool6);
         flatten_wrapper(pool6, flat);
 
         fc_wrapper(flat, fc1);
-        fc_output_wrapper(fc1, fc2);
+        relu_wrapper(fc1, fc1);
+        
+        fc_wrapper(fc1, fc2);
+        softmax_wrapper(fc2,fc2);
         
 		std::vector<int> ind = argsort(fc2.output->arr, num_classes);
 

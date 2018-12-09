@@ -12,7 +12,6 @@ target_link_libraries(
   Test
   PUBLIC
   cnpy
-  linalg
   opencv_videoio
   opencv_highgui
   OpenMP::OpenMP_CXX
