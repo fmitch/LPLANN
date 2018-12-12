@@ -1,2 +1,2 @@
 # LPLANN
-Low-precision Linear Algebra for Neural Networks
+Please see the [wiki](https://github.com/kbentum/LPLANN) for documentation.
